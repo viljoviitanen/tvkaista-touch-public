@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<!-- vim: set autoindent: 
+tvkaista-touch video player
+Copyright (C) 2013 Viljo Viitanen
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+-->
+<html>
+  <head>
+    <title>TVKaista-touch TEST</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <style>
+      body {
+        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+      }
+      td {
+        border: 1px solid #e5e5e5;
+        border-collapse: separate;
+        vertical-align: top;
+      }
+      .tv { width: 200px }
+      .form-signin {
+        max-width: 300px;
+        padding: 19px 29px 29px;
+        margin: 0 auto 20px;
+        background-color: #fff;
+        border: 1px solid #e5e5e5;
+        -webkit-border-radius: 5px;
+           -moz-border-radius: 5px;
+                border-radius: 5px;
+        -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+           -moz-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+                box-shadow: 0 1px 2px rgba(0,0,0,.05);
+      }
+      .form-signin .form-signin-heading,
+      .form-signin .checkbox {
+        margin-bottom: 10px;
+      }
+      .form-signin input[type="text"],
+      .form-signin input[type="password"] {
+        font-size: 16px;
+        height: auto;
+        margin-bottom: 15px;
+        padding: 7px 9px;
+      }
+      .spinner {
+        display:    none;
+        position:   fixed;
+        z-index:    1000;
+        top:        0;
+        left:       0;
+        height:     100%;
+        width:      100%;
+        background: rgba( 255, 255, 255, .8 ) 
+                    url('img/spinner.gif') 
+                    50% 50% 
+                    no-repeat;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="brand dropdown dropdown-toggle" data-toggle="dropdown" id="drop0" href="#">TVkaista-touch</a>
+                 <div class="dropdown-menu" role="menu" aria-labelledby="drop0" style="width:250px; height:250px">
+		   TVkaista-touch on html5-pohjainen käyttöliittymä, jonka on tarkoitus toimia hyvin lähinnä tablet-laitteilla. Tämä ei vielä ole lähellekään valmis.
+		   Palautetta otetaan vastaan sähköpostilla viljo.viitanen@gmail.com tai
+		   <a target="_blank" href="https://twitter.com/viljoviitanen">twitter.com/viljoviitanen</a> . Tekijällä ei ole mitään yhteyksiä TVkaista oy:n.
+		   <a target="_blank" href="https://github.com/viljoviitanen/tvkaista-touch-public">github.com/viljoviitanen/tvkaista-touch-public</a> 
+                 </div>
+          <div class="hide logged nav-collapse collapse">
+            <ul class="nav">
+              <li class="dropdown">
+                 <a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"><span id="date">Tänään</span> <b class="caret"></b></a>
+                 <div class="dropdown-menu" role="menu" aria-labelledby="drop1" style="width:250px; height:250px">
+		   <script>
+//TODO: päivämäärävalikko
+for (var w=0; w<5; w++) {
+  for (var d=0; d<7; d++) {
+    document.write(w+d+' ')
+  }
+  document.write('<br>')
+}
+		   </script>
+                 </div>
+              </li>
+              <li><a>Elokuvat</a></li>
+              <li><a>Lista</a></li>
+              <li><a>Sarjat</a></li>
+	      <form class="navbar-form pull-right">
+	        <input class="span2" type="text" placeholder="Ei toimi vielä">
+	        <button type="submit" class="btn">Hae</button>
+	      </form>
+            </ul>
+	    <ul class="nav pull-right">
+              <li><a href="javascript:logout()">Kirjaudu ulos</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+
+        </div>
+      </div>
+    </div>
+    <div class="container">
+    <div class="notlogged hide">
+
+      <form class="form-signin" onsubmit="login(); return false">
+        <h2 class="form-signin-heading">TVkaista-touch</h2>
+        <input type="text" id="user" class="input-block-level" placeholder="Käyttäjätunnus">
+        <input type="password" id="pass" class="input-block-level" placeholder="Salasana">
+        <label class="checkbox">
+          <input type="checkbox" id="remember">Muista kirjautuminen 2 viikkoa
+        </label>
+        <button id="loginbutton" class="btn btn-large btn-primary" >Kirjaudu sisään</button>
+      </form>
+
+    </div> <!-- /loginform -->
+
+    <div id="table" class="logged hide">
+    </div>
+
+    </div> <!-- /container -->
+    <div id="spinner" class="spinner"></div>
+    <div id="popup" class="modal hide">
+      <div id="popupcontent" class="modal-body">
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+      </div>
+    </div>
+
+    <script src='http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js'></script>
+    <script src="js/jquery.cookie.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/tv.js"></script>
+    <script src="script"></script>
+  </body>
+</html>
