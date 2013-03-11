@@ -18,6 +18,7 @@
 
 var channels
 var programs=[]
+var currentday
 
 $.ajaxSetup({
    timeout: 10000,
@@ -50,7 +51,24 @@ function addzero(a) {
   else return a
 }
 
-function showday() {
+function dayofweek(day) {
+  switch(day) {
+  case 0: return "Su"
+  case 1: return "Ma"
+  case 2: return "Ti"
+  case 3: return "Ke"
+  case 4: return "To"
+  case 5: return "Pe"
+  case 6: return "La"
+  }
+}
+
+function showday(day) {
+  if (!day) {
+    day="0"
+  }
+  currentday=day
+  $('#datemenu').html(datemenu())
   if (!channels) {
     $.getJSON('/channels',function(resp) {
       if(!resp.channels) {
@@ -71,27 +89,42 @@ function showday() {
     }
     html+='</tr><tr class="hide row'+i+'">'
     for(var j=0; j<nchannels; j++) {
-      html+='<td class="tv" id="slot'+j+'_'+i+'" onclick="showslot(this)"></td>'
+      html+='<td class="tv" id="slot'+day+'_'+j+'_'+i+'" onclick="showslot(this)"></td>'
     }
     html+='</tr>'
   }
   html+='</table>'
   $('#table').html(html)
   
-  var day
-  if (!day) {
-    day="today"
+  today=new Date()
+  if (day==0) {
+    display="Tänään"
   }
+  else {
+    d=new Date(today.getTime()-day*86400000)
+    display=dayofweek(d.getDay())+' '+d.getDate()+'.'+(1+d.getMonth())+'.'
+  }
+  $('#date').html(display)
   for(var j=0; j<nchannels; j++) {
-    showprograms(j,"today")
+    showprograms(j,day)
   }
 }
+
+
 
 function showprograms(channel,day) {
   if (!programs[day]) programs[day]=[]
 
   if (!programs[day][channel]) {
-    $.getJSON('/programs',{'day':day, 'channel':channels[channel].id},function(resp) {
+    today=new Date()
+    if (day==0) {
+      date="today"
+    }
+    else {
+      d=new Date(today.getTime()-day*86400000)
+      date=d.getFullYear()+'/'+addzero(1+d.getMonth())+'/'+addzero(d.getDate())
+    }
+    $.getJSON('/programs',{'day':date, 'channel':channels[channel].id},function(resp) {
       if(!resp.day) {
         alert("Ei onnistuttu hakemaan ohjelmalistausta")
 	return
@@ -114,7 +147,7 @@ function showprograms(channel,day) {
     //note: json api returns timestamp in finnish time. this is so this app never needs to deal with DST or timezones
     hour=stamp.getUTCHours()
     progdate=stamp.getUTCDate()
-    if (progdate != todaydate) return
+    if (day==0 && progdate != todaydate) return
     switch(hour) {
     case 5:
     case 6:
@@ -156,8 +189,8 @@ function showprograms(channel,day) {
   })
   for(i=0; i<7; i++) {
     if(s[i] != '') $('.row'+i).show()
-    $('#slot'+channel+'_'+i).html(s[i])
-    $('#slot'+channel+'_'+i).data("x",d[i])
+    $('#slot'+day+'_'+channel+'_'+i).html(s[i])
+    $('#slot'+day+'_'+channel+'_'+i).data("x",d[i])
   }
 }
 
@@ -200,3 +233,38 @@ function logout() {
   $('.logged').hide()
 }
 
+//outputs the calendar, today+4 weeks behind. "interesting" code.
+function datemenu() {
+  today=new Date()
+  //to test other days...
+  //today=new Date(today.getTime()-1*86400000)
+  todaydate=today.getDate()
+  todayday=today.getDay()
+  offset=6-todayday
+  //convert to monday first
+  offset++
+  offset%=7
+  t=[]
+  for (var i=0; i<29; i++) {
+    day=new Date(today.getTime()-i*86400000)
+    if (today.getTime()-day.getTime() < 29*86400000)
+      insert=day.getDate()
+    if (i==currentday) c="btn-inverse "
+    else if (i==0) c="btn-info "
+    else c=""
+    t[i]='<td class="'+c+'datepicker" onclick="showday('+i+')">'+insert+'</td>'
+  }
+  html='<table><tr><td>Ma</td><td>Ti</td><td>Ke</td><td>To</td><td>Pe</td><td>La</td><td>Su</td></tr>'
+  for (var w=4; w>=0; w--) {
+    html+='<tr>'
+    for (var d=6; d>=0; d--) {
+      insert=t[w*7+d-offset]
+      if (!insert) insert='<td></td>'
+      html+=insert
+    }
+    html+='</tr>'
+  }
+  html+='</table>'
+
+  return html
+}

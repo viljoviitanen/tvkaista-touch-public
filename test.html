@@ -31,8 +31,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
       td {
         border: 1px solid #e5e5e5;
         border-collapse: separate;
-        vertical-align: top;
+        
       }
+      td.tv { vertical-align: top; }
+      td.datepicker { width: 40px; height: 40px; vertical-align: center; text-align: center }
       .tv { width: 200px }
       .form-signin {
         max-width: 300px;
@@ -88,16 +90,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             <ul class="nav">
               <li class="dropdown">
                  <a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"><span id="date">Tänään</span> <b class="caret"></b></a>
-                 <div class="dropdown-menu" role="menu" aria-labelledby="drop1" style="width:250px; height:250px">
-		   <script>
-//TODO: päivämäärävalikko
-for (var w=0; w<5; w++) {
-  for (var d=0; d<7; d++) {
-    document.write(w+d+' ')
-  }
-  document.write('<br>')
-}
-		   </script>
+                 <div id="datemenu" class="dropdown-menu" role="menu" aria-labelledby="drop1" style="width:300px; height:280px">
                  </div>
               </li>
               <li><a>Elokuvat</a></li>
