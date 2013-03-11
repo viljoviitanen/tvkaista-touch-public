@@ -25,13 +25,6 @@ $.ajaxSetup({
    complete: function() {
       $("#spinner").hide()
    },
-   beforeSend: function() {
-      $("#spinner").show()
-   },
-   error: function(resp) {
-      alert("Pyyntö epäonnistui")
-   },
- 
 });
 
 $(document).ready(function () {
@@ -70,6 +63,7 @@ function showday(day) {
   currentday=day
   $('#datemenu').html(datemenu())
   if (!channels) {
+    $("#spinner").show()
     $.getJSON('/channels',function(resp) {
       if(!resp.channels) {
         alert("Ei onnistuttu hakemaan kanavalistausta")
@@ -85,9 +79,11 @@ function showday(day) {
   for(var i=0; i<7; i++) {
     html+='<tr class="myhead">'
     for(var j=0; j<nchannels; j++) {
-      if (i%3 == 0) html+='<td class="hide row'+i+' tv chtitle'+j+'">'+channels[j].name+'</td>'
+      if (i == 0) hide=""
+      else hide="hide "
+      if (i%3 == 0) html+='<td class="'+hide+'+row'+i+' tv chtitle'+j+'">'+channels[j].name+'</td>'
     }
-    html+='</tr><tr class="hide row'+i+'">'
+    html+='</tr><tr class="'+hide+'row'+i+'">'
     for(var j=0; j<nchannels; j++) {
       html+='<td class="tv" id="slot'+day+'_'+j+'_'+i+'" onclick="showslot(this)"></td>'
     }
@@ -124,14 +120,31 @@ function showprograms(channel,day) {
       d=new Date(today.getTime()-day*86400000)
       date=d.getFullYear()+'/'+addzero(1+d.getMonth())+'/'+addzero(d.getDate())
     }
-    $.getJSON('/programs',{'day':date, 'channel':channels[channel].id},function(resp) {
-      if(!resp.day) {
-        alert("Ei onnistuttu hakemaan ohjelmalistausta")
-	return
-      }
-      programs[day][channel]=resp.day
-      showprograms(channel,day)
-    })
+    $("#slot"+day+"_"+channel+"_0").html("Haetaan...<br><br><br><br>")
+    $("#slot"+day+"_"+channel+"_0").addClass("loading")
+    $('#slot'+day+'_'+channel+'_0').data("state","fetching")
+    $.ajax({
+      dataType: "json",
+      url: '/programs',
+      data: {'day':date, 'channel':channels[channel].id},
+      success: function(resp) {
+        $("#slot"+day+"_"+channel+"_0").removeClass("loading")
+        if(!resp.day) {
+          $("#slot"+day+"_"+channel+"_0").html("Ohjelmatietojen haku epäonnistui. Hae uudelleen painamalla tästä.")
+	  return
+        }
+        programs[day][channel]=resp.day
+        showprograms(channel,day)
+      },
+      error: function(jq,text,error) {
+        $("#slot"+day+"_"+channel+"_0").removeClass("loading")
+        $("#slot"+day+"_"+channel+"_0").html("Ohjelmatietojen haku epäonnistui. Hae uudelleen painamalla tästä.")
+        $('#slot'+day+'_'+channel+'_0').data("state","error")
+        $('#slot'+day+'_'+channel+'_0').data("channel",channel)
+        $('#slot'+day+'_'+channel+'_0').data("day",day)
+      },
+
+      })
     return
   }
   today=new Date;
@@ -191,6 +204,7 @@ function showprograms(channel,day) {
     if(s[i] != '') $('.row'+i).show()
     $('#slot'+day+'_'+channel+'_'+i).html(s[i])
     $('#slot'+day+'_'+channel+'_'+i).data("x",d[i])
+    $('#slot'+day+'_'+channel+'_'+i).data("state","ready")
   }
 }
 
@@ -201,8 +215,13 @@ function play(url) {
 }
 
 function showslot(e) {
-  $('#popupcontent').html($(e).data("x"))
-  $('#popup').modal()
+  if ($(e).data("state")=="error") {
+    showprograms($(e).data("channel"),$(e).data("day"))
+  }
+  else if ($(e).data("state")=="ready") {
+    $('#popupcontent').html($(e).data("x"))
+    $('#popup').modal()
+  }
 }
 
 function login() {
@@ -211,6 +230,7 @@ function login() {
     exp=14
   }
   $('#loginbutton').attr("disabled", true);
+  $("#spinner").show()
   $.post('/login',{ u: $('#user').val(), p: $('#pass').val() },function(resp) {
     $('#loginbutton').attr("disabled", false);
     if (resp.login != 'ok') {
