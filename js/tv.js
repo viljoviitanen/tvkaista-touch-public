@@ -45,7 +45,7 @@ function addzero(a) {
 }
 
 function dayofweek(day) {
-  switch(day) {
+  switch(day%7) {
   case 0: return "Su"
   case 1: return "Ma"
   case 2: return "Ti"
@@ -274,7 +274,11 @@ function datemenu() {
     else c=""
     t[i]='<td class="'+c+'datepicker" onclick="showday('+i+')">'+insert+'</td>'
   }
-  html='<table><tr><td>Ma</td><td>Ti</td><td>Ke</td><td>To</td><td>Pe</td><td>La</td><td>Su</td></tr>'
+  html='<table><tr>'
+  for (var i=1; i<8; i++) {
+    html+='<th>'+dayofweek(i)+'</th>'
+  }
+  html+='</tr>'
   for (var w=4; w>=0; w--) {
     html+='<tr>'
     for (var d=6; d>=0; d--) {

@@ -31,9 +31,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
       td {
         border: 1px solid #e5e5e5;
         border-collapse: separate;
-        
       }
       td.tv { vertical-align: top; }
+      th { text-align: center }
       td.datepicker { width: 40px; height: 40px; vertical-align: center; text-align: center }
       .tv { width: 200px }
       .form-signin {
@@ -83,10 +83,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
   <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
-        <div class="container">
 	  <ul class="nav">
 	    <li class="dropdown">
-              <a class="brand dropdown-toggle" data-toggle="dropdown" id="drop0" href="#">TVkaista-touch</a>
+              <a class="dropdown-toggle" data-toggle="dropdown" id="drop0" href="#">TVkaista-touch</a>
                  <div class="dropdown-menu" role="menu" aria-labelledby="drop0" style="width:250px; height:250px">
 		   TVkaista-touch on html5-pohjainen käyttöliittymä, jonka on tarkoitus toimia hyvin lähinnä tablet-laitteilla. Tämä ei vielä ole lähellekään valmis.
 		   Palautetta otetaan vastaan sähköpostilla viljo.viitanen@gmail.com tai
@@ -114,12 +113,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
               <li><a href="javascript:logout()">Kirjaudu ulos</a></li>
             </ul>
           </div><!--/.nav-collapse -->
-
-        </div>
       </div>
     </div>
-    <div class="container">
-    <div class="notlogged hide">
+    
+    <div class="notlogged hide"> <!-- loginform -->
 
       <form class="form-signin" onsubmit="login(); return false">
         <h2 class="form-signin-heading">TVkaista-touch</h2>
@@ -136,7 +133,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
     <div id="table" class="logged hide">
     </div>
 
-    </div> <!-- /container -->
     <div id="spinner" class="spinner"></div>
     <div id="popup" class="modal hide">
       <div id="popupcontent" class="modal-body">
