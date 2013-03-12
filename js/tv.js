@@ -81,7 +81,7 @@ function showday(day) {
     for(var j=0; j<nchannels; j++) {
       if (i == 0) hide=""
       else hide="hide "
-      if (i%3 == 0) html+='<td class="'+hide+'+row'+i+' tv chtitle'+j+'">'+channels[j].name+'</td>'
+      if (i%3 == 0) html+='<td class="'+hide+'+row'+i+' tv chtitle chtitle'+j+'">'+channels[j].name+'</td>'
     }
     html+='</tr><tr class="'+hide+'row'+i+'">'
     for(var j=0; j<nchannels; j++) {
