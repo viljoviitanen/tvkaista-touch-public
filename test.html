@@ -95,6 +95,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 		   <a target="_blank" href="https://github.com/viljoviitanen/tvkaista-touch-public">github.com/viljoviitanen/tvkaista-touch-public</a> 
                  </div>
 	    </li>
+	    <li class="dropdown">
+	      <span class="dropdown-toggle" data-toggle="dropdown" id="dropsettings"><button class="btn btn-inverse"><i class="icon-cog icon-white"></i></button></span>
+                 <div class="dropdown-menu" role="menu" aria-labelledby="dropsettings" style="width:250px; height:250px">
+		     <button type="button" class="btn" onclick="togglequality()">Vaihda laatu (nyt: <span id="quality">2M</span>)</button> 
+                 </div>
+	    </li>
 	  </ul>
           <div class="hide logged nav-collapse collapse">
             <ul class="nav">
@@ -103,21 +109,23 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
                  <div id="datemenu" class="dropdown-menu" role="menu" aria-labelledby="drop1" style="width:300px; height:280px">
                  </div>
               </li>
-              <li><a>Elokuvat</a></li>
-              <li><a>Lista</a></li>
-              <li><a>Sarjat</a></li>
-	      <form class="navbar-form pull-right">
-	        <input class="span2" type="text" placeholder="Ei toimi vielä">
-	        <button type="submit" class="btn">Hae</button>
-	      </form>
+              <li><a onclick="getresult('playlist')">Lista</a></li>
+              <li><a onclick="getresult('seasonpasses')">Sarjat</a></li>
+              <li><a onclick="getresult('search',{'search':'elokuva'})">Elokuvat</a></li>
+	      <li>
+	        <form class="navbar-search" onsubmit="return search(this)">
+	          <input class="search-query" id="searchfield" type="text" placeholder="Hae ohjelmista" style="width: 100px">
+	        </form>
+              </li>
             </ul>
 	    <ul class="nav pull-right">
-              <li><a href="javascript:logout()">Kirjaudu ulos</a></li>
+              <li><button class="btn btn-primary" onclick="javascript:logout()">Kirjaudu ulos</button></li>
             </ul>
           </div><!--/.nav-collapse -->
       </div>
     </div>
     
+    <div id="message"></div>
     <div class="notlogged hide"> <!-- loginform -->
 
       <form class="form-signin" onsubmit="login(); return false">

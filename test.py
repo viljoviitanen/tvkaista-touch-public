@@ -54,7 +54,22 @@ class ProgramHandler(webapp2.RequestHandler):
       i=i+1
 
     self.response.headers['Content-Type'] = 'application/json'   
-    self.response.write(json.dumps( { 'day': resp } ))
+    self.response.write(json.dumps( { 'result': resp } ))
+
+class SearchHandler(webapp2.RequestHandler):
+  def get(self):
+    time.sleep(2)
+    #search=self.request.GET['search']
+    resp=[]
+    i=0
+    hour=8
+    basetime=time.time()-hour*3600
+    while i<hour:
+      resp.append({ 'time': 1000*(basetime+3600*i), 'purl': '', 'title': ('Ohjelma %d'%i), 'desc': 'Ohjelman kuvaus'})
+      i=i+1
+
+    self.response.headers['Content-Type'] = 'application/json'   
+    self.response.write(json.dumps( { 'result': resp } ))
 
 class ScriptHandler(webapp2.RequestHandler):
   def get(self):
@@ -82,6 +97,9 @@ app = webapp2.WSGIApplication([
     ('/login', LoginHandler),
     ('/channels', ChannelHandler),
     ('/programs', ProgramHandler),
+    ('/playlist', SearchHandler),
+    ('/seasonpasses', SearchHandler),
+    ('/search', SearchHandler),
     ('/script', ScriptHandler),
     (r'/(.*)', FileHandler),
 ], debug=True)

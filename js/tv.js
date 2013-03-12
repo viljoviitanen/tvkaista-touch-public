@@ -19,6 +19,7 @@
 var channels
 var programs=[]
 var currentday
+var quality
 
 $.ajaxSetup({
    timeout: 10000,
@@ -28,6 +29,13 @@ $.ajaxSetup({
 });
 
 $(document).ready(function () {
+  if ($.cookie('quality')!="mp4") {
+    quality="h264"
+  }
+  else {
+    quality="mp4"
+  }
+  showquality()
   $.cookie.json = true;
   if (!$.cookie('login')) {
     $('#pass').val('')
@@ -35,9 +43,32 @@ $(document).ready(function () {
   }
   else {
     $('.logged').show()
-    showday()
+    init()
   }
 });
+
+//handle url fragment. First ! is the separator between command and parameter.
+function init() {
+  if (location.hash=="" || location.hash=="#") { //chrome: hash # -> "", IE: hash # -> "#"
+    showday()
+    return
+  }
+  sep=location.hash.indexOf('!')
+  if (sep==-1) {
+    command=location.hash.substr(1)
+    param=''
+  }
+  else {
+    command=location.hash.substr(1,sep-1)
+    param=location.hash.substr(sep+1)
+  }
+  if (command=="day") {
+    showday(param)
+  }
+  else {
+    getresult(command, (param==''?null:{'search':decodeURIComponent(param)}))
+  }
+}
 
 function addzero(a) {
   if (a<10) return "0"+a
@@ -57,8 +88,12 @@ function dayofweek(day) {
 }
 
 function showday(day) {
-  if (!day) {
+  if (!day || day==0) {
     day="0"
+    location.hash=''
+  }
+  else {
+    location.hash='day!'+day
   }
   currentday=day
   $('#datemenu').html(datemenu())
@@ -70,7 +105,7 @@ function showday(day) {
 	return
       }
       channels=resp.channels
-      showday()
+      showday(day)
     })
     return
   }
@@ -107,11 +142,11 @@ function showday(day) {
 }
 
 
-
+// also uses the global variable quality
 function showprograms(channel,day) {
   if (!programs[day]) programs[day]=[]
 
-  if (!programs[day][channel]) {
+  if (!programs[day][channel+quality]) {
     today=new Date()
     if (day==0) {
       date="today"
@@ -129,11 +164,11 @@ function showprograms(channel,day) {
       data: {'day':date, 'channel':channels[channel].id},
       success: function(resp) {
         $("#slot"+day+"_"+channel+"_0").removeClass("loading")
-        if(!resp.day) {
+        if(!resp.result) {
           $("#slot"+day+"_"+channel+"_0").html("Ohjelmatietojen haku epäonnistui. Hae uudelleen painamalla tästä.")
 	  return
         }
-        programs[day][channel]=resp.day
+        programs[day][channel+quality]=resp.result
         showprograms(channel,day)
       },
       error: function(jq,text,error) {
@@ -155,7 +190,7 @@ function showprograms(channel,day) {
     s[i]=''
     d[i]=''
   }
-  programs[day][channel].forEach(function(e) {
+  programs[day][channel+quality].forEach(function(e) {
     stamp=new Date(e.time)
     //note: json api returns timestamp in finnish time. this is so this app never needs to deal with DST or timezones
     hour=stamp.getUTCHours()
@@ -292,3 +327,72 @@ function datemenu() {
 
   return html
 }
+
+function search(form) {
+  if (form.searchfield.value=='') return false
+  getresult('search',{'search':form.searchfield.value})
+  return false
+}
+
+function getresult(url,param) {
+  $('#datemenu').html(datemenu())
+  location.hash=url+(param?(param.search?'!'+encodeURIComponent(param.search):''):'')
+  $("#table").html("Haetaan...<br><br><br><br>")
+  $("#table").addClass("loading")
+  $.ajax({
+      dataType: "json",
+      url: '/'+url,
+      data: param,
+      success: function(resp) {
+        $("#table").removeClass("loading")
+        if(!resp.result) {
+          $("#table").html("Ohjelmatietojen haku epäonnistui.")
+	  return
+        }
+        showresults(resp.result)
+      },
+      error: function(jq,text,error) {
+        $("#table").removeClass("loading")
+        $("#table").html("Ohjelmatietojen haku epäonnistui.")
+      },
+  })
+}
+
+//näyttää haun ja sarjojen tulokset
+function showresults(r) {
+  html='<table>'
+  r.reverse().forEach(function(e) {
+    stamp=new Date(e.time)
+    //note: json api returns timestamp in finnish time. this is so this app never needs to deal with DST or timezones
+    weekday=dayofweek(stamp.getUTCDay())
+    day=stamp.getUTCDate()
+    month=stamp.getUTCMonth()
+    hour=addzero(stamp.getUTCHours())
+    min=addzero(stamp.getMinutes())
+    html+='<tr><td class="programrow" onclick="play(\''+e.purl+'?username='+encodeURIComponent($.cookie('login').user)+'&password='+encodeURIComponent($.cookie('login').pass)+'\')">'+weekday+' '+day+'.'+month+'. klo '+hour+'.'+min+' '+e.title+' '+e.desc+'</td></tr>'
+  })
+  html+='</table>'
+  $('#table').html(html)
+}
+
+function togglequality() {
+  if (quality!="mp4") {
+    quality="mp4"
+    $.cookie('quality', 'mp4' ,{ expires: 365, path: '/' })
+  }
+  else {
+    quality="h264"
+    $.cookie('quality', 'h264' ,{ expires: 365, path: '/' })
+  }
+  location.reload()
+}
+
+function showquality() {
+  if (quality!="mp4") {
+    $('#quality').html('2M')
+  }
+  else {
+    $('#quality').html('300k')
+  }
+}
+
