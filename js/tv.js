@@ -44,6 +44,12 @@ $(document).ready(function () {
   else {
     $('.logged').show()
     init()
+    // detect hash changes via back/forward
+    if (window.addEventListener) {
+      window.addEventListener('hashchange', init, false);
+      } else if ( window.attachEvent ) {
+      window.attachEvent('onhashchange', init);
+    }
   }
 });
 
