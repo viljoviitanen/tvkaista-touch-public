@@ -16,6 +16,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+var realchannels
+var hidechannels
 var channels
 var programs=[]
 var currentday
@@ -37,6 +39,8 @@ $(document).ready(function () {
   }
   showquality()
   $.cookie.json = true;
+  hidechannels=$.cookie('hide')
+  if(!hidechannels) hidechannels={}
   if (!$.cookie('login')) {
     $('#pass').val('')
     $('.notlogged').show()
@@ -103,18 +107,21 @@ function showday(day) {
   }
   currentday=day
   $('#datemenu').html(datemenu())
-  if (!channels) {
+  if (!realchannels) {
     $("#spinner").show()
     $.getJSON('/channels',function(resp) {
       if(!resp.channels) {
         alert("Ei onnistuttu hakemaan kanavalistausta")
 	return
       }
-      channels=resp.channels
+      realchannels=resp.channels
       showday(day)
     })
     return
   }
+  channels=channelmap()
+  channelsettings()
+  
   var nchannels=channels.length
   var html='<table>'
   for(var i=0; i<8; i++) {
@@ -126,7 +133,7 @@ function showday(day) {
     }
     html+='</tr><tr class="'+hide+'row'+i+'">'
     for(var j=0; j<nchannels; j++) {
-      html+='<td class="tv" id="slot'+day+'_'+j+'_'+i+'" onclick="showslot(this)"></td>'
+      html+='<td class="tv" id="slot'+day+'_'+channels[j].id+'_'+i+'" onclick="showslot(this)"></td>'
     }
     html+='</tr>'
   }
@@ -143,7 +150,7 @@ function showday(day) {
   }
   $('#date').html(display)
   for(var j=0; j<nchannels; j++) {
-    showprograms(j,day)
+    showprograms(channels[j].id,day)
   }
 }
 
@@ -167,7 +174,7 @@ function showprograms(channel,day) {
     $.ajax({
       dataType: "json",
       url: '/programs',
-      data: {'day':date, 'channel':channels[channel].id},
+      data: {'day':date, 'channel':channel},
       success: function(resp) {
         $("#slot"+day+"_"+channel+"_0").removeClass("loading")
         if(!resp.result) {
@@ -419,10 +426,41 @@ function togglequality() {
 
 function showquality() {
   if (quality!="mp4") {
-    $('#quality').html('2M')
+    $('#qualitysettings').html('<button type="button" class="btn" onclick="togglequality()">Vaihda laatu (nyt: 2M)</button>')
   }
   else {
-    $('#quality').html('300k')
+    $('#qualitysettings').html('<button type="button" class="btn btn-inverse" onclick="togglequality()">Vaihda laatu (nyt: 300k)</button>')
   }
 }
 
+function channelmap() {
+  var nchannels=realchannels.length
+  var ret=[]
+  for(var j=0; j<nchannels; j++) {
+    if(!hidechannels[realchannels[j].id]) ret.push(realchannels[j])
+  }
+  return ret
+}
+
+function togglechannel(chid) {
+  if(hidechannels[chid]) {
+    delete hidechannels[chid]
+  }
+  else {
+    hidechannels[chid]=true
+  }
+  $.cookie('hide', hidechannels ,{ expires: 365, path: '/' })
+  init()
+}
+
+function channelsettings() {
+  html="Näytettävät kanavat:<br>"
+  var nchannels=realchannels.length
+  for(var j=0; j<nchannels; j++) {
+    if(!hidechannels[realchannels[j].id]) c=""
+    else c=" btn-inverse"
+    html+='<button class="btn'+c+'" onclick="togglechannel('+realchannels[j].id+')">'+realchannels[j].name+'</button>'
+  }
+  
+  $('#channelsettings').html(html)
+}
