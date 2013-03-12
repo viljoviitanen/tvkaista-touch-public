@@ -42,6 +42,7 @@ class ProgramHandler(webapp2.RequestHandler):
   def get(self):
     channel=self.request.GET['channel']
     day=self.request.GET['day']
+    time.sleep(0.5)
     if day=="today":
       hour=18
     else:
