@@ -189,7 +189,6 @@ function showprograms(channel,day) {
   if (todayhour<4) earlymorning=1
   else earlymorning=0
   todayminute=today.getMinutes()
-  $("#message").html(todaydate+" "+todayhour+":"+todayminute)
   
   var s=[]
   var d=[]
@@ -306,6 +305,7 @@ function login() {
   return false;
 }
 function logout() {
+  location.hash=''
   $.removeCookie('login', { path: '/' });
   $('#pass').val('')
   $('.notlogged').show()
