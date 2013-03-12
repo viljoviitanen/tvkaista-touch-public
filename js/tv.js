@@ -264,6 +264,10 @@ function showprograms(channel,day) {
 }
 
 function play(url) {
+  if (url.indexOf("PUUTTUU") != -1) {
+    alert("Ohjelman videomuunnos puuttuu")
+    return
+  }
   w=window.open()
   w.document.write('<style>body {background: #000} video { position: fixed; top: 0; left: 0; height: 100%; width: 100%; }</style>')
   w.document.write('<video autoplay controls src="'+url+'"></video>')
