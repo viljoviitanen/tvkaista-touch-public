@@ -111,7 +111,7 @@ function showday(day) {
   }
   var nchannels=channels.length
   var html='<table>'
-  for(var i=0; i<7; i++) {
+  for(var i=0; i<8; i++) {
     html+='<tr class="myhead">'
     for(var j=0; j<nchannels; j++) {
       if (i == 0) hide=""
@@ -182,11 +182,18 @@ function showprograms(channel,day) {
       })
     return
   }
-  today=new Date;
-  todaydate=today.getDate()
+  t=new Date;
+  today=new Date(t.getTime()+2*3600000) //approx.finnish time. don't care if it's an hour wrong.
+  todaydate=today.getUTCDate()
+  todayhour=today.getUTCHours()
+  if (todayhour<4) earlymorning=1
+  else earlymorning=0
+  todayminute=today.getMinutes()
+  $("#message").html(todaydate+" "+todayhour+":"+todayminute)
+  
   var s=[]
   var d=[]
-  for(i=0; i<7; i++) {
+  for(i=0; i<8; i++) {
     s[i]=''
     d[i]=''
   }
@@ -195,8 +202,19 @@ function showprograms(channel,day) {
     //note: json api returns timestamp in finnish time. this is so this app never needs to deal with DST or timezones
     hour=stamp.getUTCHours()
     progdate=stamp.getUTCDate()
-    if (day==0 && progdate != todaydate) return
+    // hide yesterday's programs if showing "today" unless it's before 3am
+    if (day==0) {
+      if (!earlymorning && progdate != todaydate ) return
+      if (earlymorning && progdate == todaydate ) hour+=24
+    }
     switch(hour) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+      slot=0
+	break
     case 5:
     case 6:
     case 7:
@@ -229,13 +247,15 @@ function showprograms(channel,day) {
       slot=6
 	break
     default:
-      slot=0
+      slot=7
 	break
     }
+    if (day==0 && earlymorning && progdate == todaydate ) hour-=24
+    
     s[slot]=s[slot]+addzero(hour)+'.'+addzero(stamp.getMinutes())+' '+e.title+'<br>'
     d[slot]=d[slot]+'<td class="program" onclick="play(\''+e.purl+'?username='+encodeURIComponent($.cookie('login').user)+'&password='+encodeURIComponent($.cookie('login').pass)+'\')">'+addzero(hour)+'.'+addzero(stamp.getMinutes())+' '+e.title+' '+e.desc+'</td>'
   })
-  for(i=0; i<7; i++) {
+  for(i=0; i<8; i++) {
     if(s[i] != '') $('.row'+i).show()
     $('#slot'+day+'_'+channel+'_'+i).html(s[i])
     $('#slot'+day+'_'+channel+'_'+i).data("x",d[i])
