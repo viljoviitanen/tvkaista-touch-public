@@ -49,11 +49,7 @@ $(document).ready(function () {
     $('.logged').show()
     init()
     // detect hash changes via back/forward
-    if (window.addEventListener) {
-      window.addEventListener('hashchange', init, false);
-      } else if ( window.attachEvent ) {
-      window.attachEvent('onhashchange', init);
-    }
+    window.onhashchange=init;
   }
 });
 
@@ -312,12 +308,15 @@ function login() {
       $.cookie('login',{ user: $('#user').val(), pass: $('#pass').val() } ,{ expires: exp, path: '/' })
       $('.notlogged').hide()
       $('.logged').show()
-      showday()
+      // detect hash changes via back/forward
+      window.onhashchange=init;
+      init()
     }
   })
   return false;
 }
 function logout() {
+  window.onhashchange=false;
   location.hash=''
   $.removeCookie('login', { path: '/' });
   $('#pass').val('')
