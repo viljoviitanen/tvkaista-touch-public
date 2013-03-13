@@ -76,21 +76,32 @@ class ScriptHandler(webapp2.RequestHandler):
   def get(self):
 
     self.response.headers['Content-Type'] = 'application/javascript' 
-    self.response.write('//nothing here')
+    self.response.write("""
+document.write('<div class="notlogged hide well container">')
+document.write('Tämä on tvkaista-touchin kehitysversio, joka näyttää vain "dummy" -sisältöä. Koodi on <a href="https://github.com/viljoviitanen/tvkaista-touch-public">githubissa</a>.')
+document.write('<p>Käyttäjätunnukseksi ja salasanaksi käy mitä tahansa, kunhan eivät ole tyhjiä.')
+document.write('</div>')
+""")
 
 class FileHandler(webapp2.RequestHandler):
   def get(self,path):
 
-    f=open("./"+path,'r')
     if re.search('html$',path):
       self.response.headers['Content-Type'] = 'text/html' 
     elif re.search('css$',path):
       self.response.headers['Content-Type'] = 'text/css' 
     elif re.search('js$',path):
       self.response.headers['Content-Type'] = 'application/javascript' 
+    elif re.search('gif$',path):
+      self.response.headers['Content-Type'] = 'image/gif' 
+    elif re.search('png$',path):
+      self.response.headers['Content-Type'] = 'image/png' 
     else:
-      self.response.headers['Content-Type'] = 'text/plain' 
-
+      self.abort(403)
+    try:
+      f=open("./"+path,'r')
+    except IOError:
+      self.abort(404)
     self.response.write(f.read())
     f.close
 
