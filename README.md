@@ -19,6 +19,10 @@ koska tvkaistan www-sivujen tietokonenäkymä eikä myöskään mobiilinäkymä 
 Käyttöliittymän html5/javascript on GPL-lisenssoitu, samoin "dummy"-rajapinnan tarjoava sovellus test.py .
 Tuotannossa (http://tvkaista-touch.appspot.com) oleva rajapintakoodi ei ole julkista.
 
+"Dummy"-versio on ajossa [heroku](http://www.heroku.com) -alustalla osoitteessa
+http://tvkaista-touch-public.herokuapp.com/test.html , jossa käyttöliittymää voi testata ilman
+tvkaistan tunnusta. Ajossa on tämä githubissa oleva koodi sellaisenaan.
+
 Rajapinta on toteutettu Googlen tekemällä webapp2 -kirjastolla. Asennusohjeet löytyvät osoitteesta
 http://webapp-improved.appspot.com/tutorials/quickstart.nogae.html
 
