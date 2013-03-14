@@ -33,7 +33,3 @@ Kun ympäristö on kunnossa, sovelluksen voi käynnistää komennolla
 ja käyttöliittymää voi testata menemällä selaimella osoitteeseen http://127.0.0.1:8080/test.html
 > Huom. www-serveri on auki myös "maailmalle", eli myös muilta laitteilta
 > pääsee testaamaan käyttöliittymää, mikäli portti 8080 on sallittu koneesi paikallsesta palomuurista.
-> Serverin tietoturva ei ole sellainen mitä luultavasti tahtoisit sen olevan, ja sitä kautta
-> saattaa päästä käsiksi mihin tahansa kotikoneesi tiedostoon. 
-
-
