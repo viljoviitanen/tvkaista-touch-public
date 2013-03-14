@@ -20,7 +20,7 @@ Käyttöliittymän html5/javascript on GPL-lisenssoitu, samoin "dummy"-rajapinna
 Tuotannossa (http://tvkaista-touch.appspot.com) oleva rajapintakoodi ei ole julkista.
 
 "Dummy"-versio on ajossa [heroku](http://www.heroku.com) -alustalla osoitteessa
-http://tvkaista-touch-public.herokuapp.com/test.html , jossa käyttöliittymää voi testata ilman
+http://tvkaista-touch-public.herokuapp.com/ , jossa käyttöliittymää voi testata ilman
 tvkaistan tunnusta. Ajossa on tämä githubissa oleva koodi sellaisenaan.
 
 Rajapinta on toteutettu Googlen tekemällä webapp2 -kirjastolla. Asennusohjeet löytyvät osoitteesta
@@ -30,6 +30,16 @@ Kun ympäristö on kunnossa, sovelluksen voi käynnistää komennolla
 
     python test.py
 
-ja käyttöliittymää voi testata menemällä selaimella osoitteeseen http://127.0.0.1:8080/test.html
+ja käyttöliittymää voi testata menemällä selaimella osoitteeseen http://127.0.0.1:8080/
 > Huom. www-serveri on auki myös "maailmalle", eli myös muilta laitteilta
 > pääsee testaamaan käyttöliittymää, mikäli portti 8080 on sallittu koneesi paikallsesta palomuurista.
+
+Sovelluksen ajaminen herokussa on hyvin helppoa. Ohjeet herokun käyttöönottoon ovat osoitteessa
+https://devcenter.heroku.com/articles/quickstart . Pitää vain asentaa herokun "toolbelt",
+ja sen jälkeen riittää ajaa nämä komennot:
+
+    git clone git://github.com/viljoviitanen/tvkaista-touch-public
+    cd tvkaista-touch-public
+    heroku create
+    git push heroku master
+    heroku open
