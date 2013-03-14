@@ -87,6 +87,8 @@ document.write('</div>')
 class FileHandler(webapp2.RequestHandler):
   def get(self,path):
 
+    if (path==''):
+      path='test.html'
     if re.search('html$',path):
       self.response.headers['Content-Type'] = 'text/html' 
     elif re.search('css$',path):
