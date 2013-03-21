@@ -405,7 +405,7 @@ function showresults(r) {
     month=stamp.getUTCMonth()
     hour=addzero(stamp.getUTCHours())
     min=addzero(stamp.getMinutes())
-    html+='<tr><td class="programrow" onclick="play(\''+e.purl+'?username='+encodeURIComponent($.cookie('login').user)+'&password='+encodeURIComponent($.cookie('login').pass)+'\')"><b>'+weekday+' '+day+'.'+month+'. klo '+hour+'.'+min+' '+e.title+'</b><br>'+e.desc+'</td></tr>'
+    html+='<tr><td class="programrow" onclick="play(\''+e.purl+'?username='+encodeURIComponent($.cookie('login').user)+'&password='+encodeURIComponent($.cookie('login').pass)+'\')"><b>'+weekday+' '+day+'.'+month+'. klo '+hour+'.'+min+' '+e.title+'</b><br>'+e.desc+' ('+e.ch+')</td></tr>'
   })
   html+='</table>'
   $('#table').html(html)

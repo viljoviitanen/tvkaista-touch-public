@@ -67,7 +67,7 @@ class SearchHandler(webapp2.RequestHandler):
     hour=8
     basetime=time.time()-hour*3600
     while i<hour:
-      resp.append({ 'time': 1000*(basetime+3600*i), 'purl': '', 'title': ('Ohjelma %d'%i), 'desc': 'Ohjelman kuvaus'})
+      resp.append({ 'time': 1000*(basetime+3600*i), 'purl': '', 'title': ('Ohjelma %d'%i), 'desc': 'Ohjelman kuvaus', 'ch': 'KANAVA'})
       i=i+1
 
     self.response.headers['Content-Type'] = 'application/json'   
