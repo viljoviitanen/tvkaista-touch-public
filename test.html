@@ -36,8 +36,18 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
       th { text-align: center }
       td.datepicker { width: 40px; height: 40px; vertical-align: center; text-align: center }
       .chtitle { font-weight: bold }
-      .tv { width: 200px }
-      .programrow { height: 40px }
+      .tv { min-width: 140px }
+      .programrow { height: 60px }
+      .program { vertical-align: top; min-width: 140px }
+      .maxheight {
+	max-height: 85%;
+      }
+      .widemodal {
+	top: 5%;
+	left: 10%;
+	width: 80%;
+	margin-left: 0px;
+      }
       .form-signin {
         max-width: 300px;
         padding: 19px 29px 29px;
@@ -146,8 +156,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
     </div>
 
     <div id="spinner" class="spinner"></div>
-    <div id="popup" class="modal hide">
-      <div id="popupcontent" class="modal-body">
+    <div id="popup" class="modal hide widemodal">
+      <div id="popupcontent" class="modal-body maxheight">
       </div>
       <div class="modal-footer">
         <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>

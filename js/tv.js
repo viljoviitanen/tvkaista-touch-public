@@ -125,8 +125,8 @@ function showday(day) {
     for(var j=0; j<nchannels; j++) {
       if (i == 0) hide=""
       else hide="hide "
-      if (i%3 == 0) html+='<td class="'+hide+'+row'+i+' tv chtitle chtitle'+j+'">'+channels[j].name+'</td>'
-    }
+      if (i == 0 || i == 4) html+='<td class="'+hide+'row'+i+' tv chtitle chtitle'+j+'">'+channels[j].name+'</td>'
+     }
     html+='</tr><tr class="'+hide+'row'+i+'">'
     for(var j=0; j<nchannels; j++) {
       html+='<td class="tv" id="slot'+day+'_'+channels[j].id+'_'+i+'" onclick="showslot(this)"></td>'
@@ -174,7 +174,7 @@ function showprograms(channel,day) {
       success: function(resp) {
         $("#slot"+day+"_"+channel+"_0").removeClass("loading")
         if(!resp.result) {
-          $("#slot"+day+"_"+channel+"_0").html("Ohjelmatietojen haku epäonnistui. Hae uudelleen painamalla tästä.")
+          $("#slot"+day+"_"+channel+"_0").html('<span class="text-info">Ohjelmatietojen haku epäonnistui. Hae uudelleen painamalla tästä.</span>')
 	  return
         }
         programs[day][channel+quality]=resp.result
@@ -182,7 +182,7 @@ function showprograms(channel,day) {
       },
       error: function(jq,text,error) {
         $("#slot"+day+"_"+channel+"_0").removeClass("loading")
-        $("#slot"+day+"_"+channel+"_0").html("Ohjelmatietojen haku epäonnistui. Hae uudelleen painamalla tästä.")
+        $("#slot"+day+"_"+channel+"_0").html('<span class="text-info">Ohjelmatietojen haku epäonnistui. Hae uudelleen painamalla tästä.</span>')
         $('#slot'+day+'_'+channel+'_0').data("state","error")
         $('#slot'+day+'_'+channel+'_0').data("channel",channel)
         $('#slot'+day+'_'+channel+'_0').data("day",day)
@@ -261,7 +261,7 @@ function showprograms(channel,day) {
     if (day==0 && earlymorning && progdate == todaydate ) hour-=24
     
     s[slot]=s[slot]+addzero(hour)+'.'+addzero(stamp.getMinutes())+' '+e.title+'<br>'
-    d[slot]=d[slot]+'<td class="program" onclick="play(\''+e.purl+'?username='+encodeURIComponent($.cookie('login').user)+'&password='+encodeURIComponent($.cookie('login').pass)+'\')">'+addzero(hour)+'.'+addzero(stamp.getMinutes())+' '+e.title+' '+e.desc+'</td>'
+    d[slot]=d[slot]+'<td class="program" onclick="play(\''+e.purl+'?username='+encodeURIComponent($.cookie('login').user)+'&password='+encodeURIComponent($.cookie('login').pass)+'\')"><b>'+addzero(hour)+'.'+addzero(stamp.getMinutes())+' '+e.title+'</b><br>'+e.desc+'</td>'
   })
   for(i=0; i<8; i++) {
     if(s[i] != '') $('.row'+i).show()
@@ -278,7 +278,7 @@ function play(url) {
   }
   w=window.open()
   w.document.write('<style>body {background: #000} video { position: fixed; top: 0; left: 0; height: 100%; width: 100%; }</style>')
-  w.document.write('<video autoplay controls src="'+url+'"></video>')
+  w.document.write('<video autoplay controls onclick="this.webkitEnterFullscreen()" src="'+url+'"></video>')
 }
 
 function showslot(e) {
@@ -286,7 +286,7 @@ function showslot(e) {
     showprograms($(e).data("channel"),$(e).data("day"))
   }
   else if ($(e).data("state")=="ready") {
-    $('#popupcontent').html($(e).data("x"))
+    $('#popupcontent').html('<table><tr>'+$(e).data("x")+'</tr></table>')
     $('#popup').modal()
   }
 }
@@ -382,14 +382,14 @@ function getresult(url,param) {
       success: function(resp) {
         $("#table").removeClass("loading")
         if(!resp.result) {
-          $("#table").html("Ohjelmatietojen haku epäonnistui.")
+          $("#table").html('<span class="text-error">Ohjelmatietojen haku epäonnistui.</span>')
 	  return
         }
         showresults(resp.result)
       },
       error: function(jq,text,error) {
         $("#table").removeClass("loading")
-        $("#table").html("Ohjelmatietojen haku epäonnistui.")
+        $("#table").html('<span class="text-error">Ohjelmatietojen haku epäonnistui.</span>')
       },
   })
 }
@@ -405,7 +405,7 @@ function showresults(r) {
     month=stamp.getUTCMonth()
     hour=addzero(stamp.getUTCHours())
     min=addzero(stamp.getMinutes())
-    html+='<tr><td class="programrow" onclick="play(\''+e.purl+'?username='+encodeURIComponent($.cookie('login').user)+'&password='+encodeURIComponent($.cookie('login').pass)+'\')">'+weekday+' '+day+'.'+month+'. klo '+hour+'.'+min+' '+e.title+' '+e.desc+'</td></tr>'
+    html+='<tr><td class="programrow" onclick="play(\''+e.purl+'?username='+encodeURIComponent($.cookie('login').user)+'&password='+encodeURIComponent($.cookie('login').pass)+'\')"><b>'+weekday+' '+day+'.'+month+'. klo '+hour+'.'+min+' '+e.title+'</b><br>'+e.desc+'</td></tr>'
   })
   html+='</table>'
   $('#table').html(html)
