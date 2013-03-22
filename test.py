@@ -67,7 +67,7 @@ class SearchHandler(webapp2.RequestHandler):
     hour=8
     basetime=time.time()-hour*3600
     while i<hour:
-      resp.append({ 'time': 1000*(basetime+3600*i), 'purl': '', 'title': ('Ohjelma %d'%i), 'desc': 'Ohjelman kuvaus', 'ch': 'KANAVA'})
+      resp.append({ 'time': 1000*(basetime+3600*i), 'purl': 'http://s3.amazonaws.com/viljoviitanen/WP_20130315_110705Z.mp4', 'title': ('Ohjelma %d'%i), 'desc': 'Ohjelman kuvaus', 'ch': 'KANAVA'})
       i=i+1
 
     self.response.headers['Content-Type'] = 'application/json'   
