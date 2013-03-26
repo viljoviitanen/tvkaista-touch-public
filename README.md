@@ -5,6 +5,7 @@ Author has no relations to the company reponsible for the tvkaista service.
 This project includes the following code:
 * http://twitter.github.com/bootstrap/ Copyright 2012 Twitter, Inc. - Licensed under the Apache License, Version 2.0 
 * https://github.com/carhartl/jquery-cookie Copyright 2013 Klaus Hartl - MIT Licensed
+* http://jquerymobile.com Copyright 2013 jQuery Foundation, Inc. - MIT Licensed
 
 Files test.html, test.py and js/tv.js are GPL licensed.
 

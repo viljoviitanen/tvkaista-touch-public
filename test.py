@@ -33,6 +33,12 @@ class LoginHandler(webapp2.RequestHandler):
     self.response.headers['Content-Type'] = 'application/json'   
     self.response.write(json.dumps( { 'login': resp } ))
 
+class MenuHandler(webapp2.RequestHandler):
+  def post(self):
+    time.sleep(1)
+    self.response.headers['Content-Type'] = 'application/json'   
+    self.response.write(json.dumps( { 'result': 'ok' } ))
+
 class ChannelHandler(webapp2.RequestHandler):
   def get(self):
     self.response.headers['Content-Type'] = 'application/json'   
@@ -52,7 +58,7 @@ class ProgramHandler(webapp2.RequestHandler):
     i=0
     basetime=time.time()-hour*3600
     while i<hour:
-      resp.append({ 'time': 1000*(basetime+3600*i), 'purl': 'http://s3.amazonaws.com/viljoviitanen/WP_20130315_110705Z.mp4', 'title': ('Ohjelma %d'%i), 'desc': 'Ohjelman kuvaus'})
+      resp.append({ 'time': 1000*(basetime+3600*i), 'purl': 'http://s3.amazonaws.com/viljoviitanen/WP_20130315_110705Z.mp4', 'title': ('Ohjelma %d'%i), 'desc': 'Ohjelman kuvaus', 'ch': 'KANAVA', 'id': 10000+i})
       i=i+1
 
     self.response.headers['Content-Type'] = 'application/json'   
@@ -67,7 +73,7 @@ class SearchHandler(webapp2.RequestHandler):
     hour=8
     basetime=time.time()-hour*3600
     while i<hour:
-      resp.append({ 'time': 1000*(basetime+3600*i), 'purl': 'http://s3.amazonaws.com/viljoviitanen/WP_20130315_110705Z.mp4', 'title': ('Ohjelma %d'%i), 'desc': 'Ohjelman kuvaus', 'ch': 'KANAVA'})
+      resp.append({ 'time': 1000*(basetime+3600*i), 'purl': 'http://s3.amazonaws.com/viljoviitanen/WP_20130315_110705Z.mp4', 'title': ('Ohjelma %d'%i), 'desc': 'Ohjelman kuvaus', 'ch': 'KANAVA', 'id': 10000+i})
       i=i+1
 
     self.response.headers['Content-Type'] = 'application/json'   
@@ -81,6 +87,7 @@ class ScriptHandler(webapp2.RequestHandler):
 document.write('<div class="notlogged hide well container">')
 document.write('Tämä on tvkaista-touchin kehitysversio, joka näyttää vain "dummy" -sisältöä. Koodi on <a href="https://github.com/viljoviitanen/tvkaista-touch-public">githubissa</a>.')
 document.write('<p>Käyttäjätunnukseksi ja salasanaksi käy mitä tahansa, kunhan eivät ole tyhjiä.')
+document.write('<p><a onclick="changelog()">Muutoshistoria</a> ')
 document.write('</div>')
 """)
 
@@ -93,6 +100,8 @@ class FileHandler(webapp2.RequestHandler):
       self.response.headers['Content-Type'] = 'text/html' 
     elif re.search('css$',path):
       self.response.headers['Content-Type'] = 'text/css' 
+    elif re.search('txt$',path):
+      self.response.headers['Content-Type'] = 'text/plain' 
     elif re.search('js$',path):
       self.response.headers['Content-Type'] = 'application/javascript' 
     elif re.search('gif$',path):
@@ -110,6 +119,7 @@ class FileHandler(webapp2.RequestHandler):
 
 app = webapp2.WSGIApplication([
     ('/login', LoginHandler),
+    ('/menu', MenuHandler),
     ('/channels', ChannelHandler),
     ('/programs', ProgramHandler),
     ('/playlist', SearchHandler),

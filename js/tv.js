@@ -22,6 +22,7 @@ var channels
 var programs=[]
 var currentday
 var quality
+var scrolling
 
 $.ajaxSetup({
    timeout: 10000,
@@ -31,6 +32,14 @@ $.ajaxSetup({
 });
 
 $(document).ready(function () {
+  //otherwise IE10 on a windows 8 tablet registers taphold even when scrolling
+  $(window).scrollstart(function() {
+    scrolling=1
+  })
+  $(window).scrollstop(function() {
+    scrolling=0
+  })
+
   if ($.cookie('quality')!="mp4") {
     quality="h264"
   }
@@ -74,6 +83,15 @@ function init() {
   else {
     getresult(command, (param==''?null:{'search':decodeURIComponent(param)}))
   }
+}
+
+function escapehtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
 }
 
 function addzero(a) {
@@ -261,7 +279,8 @@ function showprograms(channel,day) {
     if (day==0 && earlymorning && progdate == todaydate ) hour-=24
     
     s[slot]=s[slot]+addzero(hour)+'.'+addzero(stamp.getMinutes())+' '+e.title+'<br>'
-    d[slot]=d[slot]+'<td class="program" onclick="play(\''+e.purl+'?username='+encodeURIComponent($.cookie('login').user)+'&password='+encodeURIComponent($.cookie('login').pass)+'\')"><b>'+addzero(hour)+'.'+addzero(stamp.getMinutes())+' '+e.title+'</b><br>'+e.desc+'</td>'
+    title=addzero(hour)+'.'+addzero(stamp.getMinutes())+' '+escapehtml(e.title)
+    d[slot]=d[slot]+'<td class="program" data-title="'+title+'" data-id="'+e.id+'" data-url="'+e.purl+'"><b>'+title+'</b><br>'+escapehtml(e.desc)+'</td>'
   })
   for(i=0; i<8; i++) {
     if(s[i] != '') $('.row'+i).show()
@@ -271,11 +290,70 @@ function showprograms(channel,day) {
   }
 }
 
-function play(url) {
+function menuclick(e,operation,t)
+{
+  if (operation==4) {
+    r=confirm("Huomio, sarjoja ei voi toistaiseksi poistaa tästä käyttöliittymästä. Oletko varma että haluat lisätä ohjelman "+t+" sarjoihin?")
+    if (!r) return
+  }
+  $(e).button('loading')
+  $.ajax({
+      dataType: "json",
+      url: '/menu',
+      type: 'POST',
+      context: e,
+      data: { op: operation, id: $(e).data("id") },
+      success: function(resp) {
+        html=$(this).html()
+        if(resp.result != 'ok') {
+          $(this).html(html+' Epäonnistui!')
+          $(this).addClass('btn-danger')
+	  return
+        }
+        $(this).html(html+' ok')
+        $(this).addClass('btn-success')
+      },
+      error: function() {
+        $(this).button('reset')
+        html=$(this).html()
+        $(this).html(html+' - yritä uudelleen')
+        $(this).addClass('btn-info')
+      },
+  })
+}
+
+function menu() {
+  if (scrolling) {
+    return
+  }
+  $(this).off('click')
+  html="<b>"+$(this).data("title")+"</b><br>"
+  if (location.hash=='#playlist') {
+    html+='<button type="button" data-loading-text="Poistetaan listalta..." data-id="'+$(this).data("id")+'" onclick="menuclick(this,1)" class="btn">Poista katselulistalta</button> '
+  }
+  else {
+    html+='<button type="button" data-loading-text="Lisätään listalle..." data-id="'+$(this).data("id")+'" onclick="menuclick(this,2)" class="btn">Lisää katselulistaan</button> '
+  }
+  if (location.hash=='#seasonpasses') {
+    //html+='<button type="button" data-loading-text="Poistetaan sarjoista..." data-id="'+$(this).data("id")+'" onclick="menuclick(this,3)" class="btn">Poista sarjoista</button> '
+    //TODO cannot do like this. Need to find out the seasonpass number. That requires to fetch the seasonpasses one by one and not with * and add the seasonpass number in the
+    //data attributes.
+  }
+  else {
+    html+='<button type="button" data-loading-text="Lisätään sarjoihin..." data-id="'+$(this).data("id")+'" onclick="menuclick(this,4,'+"'"+$(this).data("title")+"'"+')" class="btn">Lisää sarjoihin</button> '
+  }
+  html+='<button type="button" data-url="'+$(this).data("url")+'" class="btn play">Toista</button> '
+  $(this).html(html)
+  $('.play').click(play)
+}
+
+function play() {
+  url=$(this).data("url")
   if (url.indexOf("PUUTTUU") != -1) {
     alert("Ohjelman videomuunnos puuttuu")
     return
   }
+  url+='?username='+encodeURIComponent($.cookie('login').user)+'&password='+encodeURIComponent($.cookie('login').pass)
   w=window.open()
   w.document.write('<style>body {background: #000} video { position: fixed; top: 0; left: 0; height: 100%; width: 100%; }</style>')
   w.document.write('<video autoplay controls onclick="this.webkitEnterFullscreen()" src="'+url+'"></video>')
@@ -288,6 +366,8 @@ function showslot(e) {
   else if ($(e).data("state")=="ready") {
     $('#popupcontent').html('<table><tr>'+$(e).data("x")+'</tr></table>')
     $('#popup').modal()
+    $('.program').click(play)
+    $('.program').taphold(menu)
   }
 }
 
@@ -405,10 +485,13 @@ function showresults(r) {
     month=stamp.getUTCMonth()
     hour=addzero(stamp.getUTCHours())
     min=addzero(stamp.getMinutes())
-    html+='<tr><td class="programrow" onclick="play(\''+e.purl+'?username='+encodeURIComponent($.cookie('login').user)+'&password='+encodeURIComponent($.cookie('login').pass)+'\')"><b>'+weekday+' '+day+'.'+month+'. klo '+hour+'.'+min+' '+e.title+'</b><br>'+e.desc+' ('+e.ch+')</td></tr>'
+    title=weekday+' '+day+'.'+month+'. klo '+hour+'.'+min+' '+escapehtml(e.title)
+    html+='<tr><td class="programrow" data-title="'+title+'" data-id="'+e.id+'" data-url="'+e.purl+'"><b>'+title+'</b><br>'+escapehtml(e.desc)+' ('+e.ch+')</td></tr>'
   })
   html+='</table>'
   $('#table').html(html)
+  $('.programrow').click(play)
+  $('.programrow').taphold(menu)
 }
 
 function togglequality() {
@@ -462,4 +545,18 @@ function channelsettings() {
   }
   
   $('#channelsettings').html(html)
+}
+
+function changelog() {
+  html='\
+<h3>Viimeisimmät muutokset</h3>\
+<table class="table">\
+<tr><td>27.3.2013</td> <td>Lisätty pitkään painamalla esiin tuleva valikko, josta ohjelman saa lisättyä katselulistalle tai sarjoihin </td></tr>\
+<tr><td>21.3.2013</td> <td>Käytettävyysparannuksia </td></tr>\
+<tr><td>9.3.2013</td> <td>Ensimmäinen julkinen versio  </td></tr>\
+</table>\
+Tarkka muutoshistoria on <a href="https://github.com/viljoviitanen/tvkaista-touch-public/commits/master">githubissa</a>.\
+'
+  $('#popupcontent').html(html)
+  $('#popup').modal()
 }
