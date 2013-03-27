@@ -64,6 +64,7 @@ $(document).ready(function () {
 
 //handle url fragment. First ! is the separator between command and parameter.
 function init() {
+  $('#datemenu').html(datemenu())
   if (location.hash=="" || location.hash=="#") { //chrome: hash # -> "", IE: hash # -> "#"
     showday()
     return
@@ -292,10 +293,6 @@ function showprograms(channel,day) {
 
 function menuclick(e,operation,t)
 {
-  if (operation==4) {
-    r=confirm("Huomio, sarjoja ei voi toistaiseksi poistaa tästä käyttöliittymästä. Oletko varma että haluat lisätä ohjelman "+t+" sarjoihin?")
-    if (!r) return
-  }
   $(e).button('loading')
   $.ajax({
       dataType: "json",
@@ -335,9 +332,7 @@ function menu() {
     html+='<button type="button" data-loading-text="Lisätään listalle..." data-id="'+$(this).data("id")+'" onclick="menuclick(this,2)" class="btn">Lisää katselulistaan</button> '
   }
   if (location.hash=='#seasonpasses') {
-    //html+='<button type="button" data-loading-text="Poistetaan sarjoista..." data-id="'+$(this).data("id")+'" onclick="menuclick(this,3)" class="btn">Poista sarjoista</button> '
-    //TODO cannot do like this. Need to find out the seasonpass number. That requires to fetch the seasonpasses one by one and not with * and add the seasonpass number in the
-    //data attributes.
+    html+='<button type="button" data-loading-text="Poistetaan sarjoista..." data-id="'+$(this).data("seasonpass")+'" onclick="menuclick(this,3)" class="btn">Poista sarjoista</button> '
   }
   else {
     html+='<button type="button" data-loading-text="Lisätään sarjoihin..." data-id="'+$(this).data("id")+'" onclick="menuclick(this,4,'+"'"+$(this).data("title")+"'"+')" class="btn">Lisää sarjoihin</button> '
@@ -451,31 +446,50 @@ function search(form) {
 }
 
 function getresult(url,param) {
-  $('#datemenu').html(datemenu())
+  $("#table").html('')
   location.hash=url+(param?(param.search?'!'+encodeURIComponent(param.search):''):'')
-  $("#table").html("Haetaan...<br><br><br><br>")
-  $("#table").addClass("loading")
+  if (url=='seasonpasses') {
+    $("#spinner").show()
+    $.getJSON('/listseasonpasses',function(resp) {
+      if(!resp.seasonpasses) {
+        alert("Ei onnistuttu hakemaan suosikkiohjelmia")
+	return
+      }
+      resp.seasonpasses.forEach(function(e) {
+        doresult('seasonpasses',{'id': e.id}, e.id)
+      })
+    })
+  }
+  else {
+    doresult(url,param,1)
+  }
+}
+
+function doresult(url,param,id) {
+  $("#table").append('<div id="'+id+'"></div>')
+  $("#"+id).html("Haetaan...<br><br><br><br>")
+  $("#"+id).addClass("loading")
   $.ajax({
       dataType: "json",
       url: '/'+url,
       data: param,
       success: function(resp) {
-        $("#table").removeClass("loading")
+        $("#"+id).removeClass("loading")
         if(!resp.result) {
-          $("#table").html('<span class="text-error">Ohjelmatietojen haku epäonnistui.</span>')
+          $("#"+id).html('<span class="text-error">Ohjelmatietojen haku epäonnistui.</span>')
 	  return
         }
-        showresults(resp.result)
+        showresults(resp.result,id)
       },
       error: function(jq,text,error) {
-        $("#table").removeClass("loading")
-        $("#table").html('<span class="text-error">Ohjelmatietojen haku epäonnistui.</span>')
+        $("#"+id).removeClass("loading")
+        $("#"+id).html('<span class="text-error">Ohjelmatietojen haku epäonnistui.</span>')
       },
   })
 }
 
 //näyttää haun ja sarjojen tulokset
-function showresults(r) {
+function showresults(r,id) {
   html='<table>'
   r.reverse().forEach(function(e) {
     stamp=new Date(e.time)
@@ -486,12 +500,12 @@ function showresults(r) {
     hour=addzero(stamp.getUTCHours())
     min=addzero(stamp.getMinutes())
     title=weekday+' '+day+'.'+month+'. klo '+hour+'.'+min+' '+escapehtml(e.title)
-    html+='<tr><td class="programrow" data-title="'+title+'" data-id="'+e.id+'" data-url="'+e.purl+'"><b>'+title+'</b><br>'+escapehtml(e.desc)+' ('+e.ch+')</td></tr>'
+    html+='<tr><td class="programrow '+id+'" data-title="'+title+'" data-seasonpass="'+id+'" data-id="'+e.id+'" data-url="'+e.purl+'"><b>'+title+'</b><br>'+escapehtml(e.desc)+' ('+e.ch+')</td></tr>'
   })
   html+='</table>'
-  $('#table').html(html)
-  $('.programrow').click(play)
-  $('.programrow').taphold(menu)
+  $('#'+id).html(html)
+  $('.'+id).click(play)
+  $('.'+id).taphold(menu)
 }
 
 function togglequality() {

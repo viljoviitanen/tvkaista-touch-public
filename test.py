@@ -39,6 +39,11 @@ class MenuHandler(webapp2.RequestHandler):
     self.response.headers['Content-Type'] = 'application/json'   
     self.response.write(json.dumps( { 'result': 'ok' } ))
 
+class ListSeasonPassesHandler(webapp2.RequestHandler):
+  def get(self):
+    self.response.headers['Content-Type'] = 'application/json'   
+    self.response.write(json.dumps( {"seasonpasses": [ {"name": "Ohjelma A", "id": "1000"}, {"name": "Ohjelma B", "id": "1001"}, {"name": "Ohjelma C", "id": "1002"} ]} ))
+
 class ChannelHandler(webapp2.RequestHandler):
   def get(self):
     self.response.headers['Content-Type'] = 'application/json'   
@@ -124,6 +129,7 @@ app = webapp2.WSGIApplication([
     ('/programs', ProgramHandler),
     ('/playlist', SearchHandler),
     ('/seasonpasses', SearchHandler),
+    ('/listseasonpasses', ListSeasonPassesHandler),
     ('/search', SearchHandler),
     ('/script', ScriptHandler),
     (r'/(.*)', FileHandler),
