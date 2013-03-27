@@ -37,7 +37,7 @@ $(document).ready(function () {
     scrolling=1
   })
   $(window).scrollstop(function() {
-    scrolling=0
+    setTimeout(function() { scrolling=0 },500)
   })
 
   if ($.cookie('quality')!="mp4") {

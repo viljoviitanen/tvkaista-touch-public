@@ -70,7 +70,7 @@ class SearchHandler(webapp2.RequestHandler):
     #search=self.request.GET['search']
     resp=[]
     i=0
-    hour=8
+    hour=20
     basetime=time.time()-hour*3600
     while i<hour:
       resp.append({ 'time': 1000*(basetime+3600*i), 'purl': 'http://s3.amazonaws.com/viljoviitanen/WP_20130315_110705Z.mp4', 'title': ('Ohjelma %d'%i), 'desc': 'Ohjelman kuvaus', 'ch': 'KANAVA', 'id': 10000+i})
