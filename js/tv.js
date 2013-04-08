@@ -40,13 +40,15 @@ $(document).ready(function () {
     setTimeout(function() { scrolling=0 },500)
   })
 
-  if ($.cookie('quality')!="mp4") {
+  if ($.cookie('quality')!="mp4" && $.cookie('quality')!="mpeg4") {
     quality="h264"
   }
-  else {
+  else if ($.cookie('quality')!="mpeg4") {
     quality="mp4"
   }
-  showquality()
+  else {
+    quality="mpeg4"
+  }
   $.cookie.json = true;
   hidechannels=$.cookie('hide')
   if(!hidechannels) hidechannels={}
@@ -64,6 +66,7 @@ $(document).ready(function () {
 
 //handle url fragment. First ! is the separator between command and parameter.
 function init() {
+  showquality()
   $('#datemenu').html(datemenu())
   if (location.hash=="" || location.hash=="#") { //chrome: hash # -> "", IE: hash # -> "#"
     showday()
@@ -113,6 +116,7 @@ function dayofweek(day) {
 }
 
 function showday(day) {
+  $('#table').html('')
   if (!day || day==0) {
     day="0"
     location.hash=''
@@ -397,6 +401,7 @@ function logout() {
   $('#pass').val('')
   $('.notlogged').show()
   $('.logged').hide()
+  programs=[]
 }
 
 //outputs the calendar, today+4 weeks behind. "interesting" code.
@@ -450,14 +455,21 @@ function getresult(url,param) {
   location.hash=url+(param?(param.search?'!'+encodeURIComponent(param.search):''):'')
   if (url=='seasonpasses') {
     $("#spinner").show()
-    $.getJSON('/listseasonpasses',function(resp) {
-      if(!resp.seasonpasses) {
-        alert("Ei onnistuttu hakemaan suosikkiohjelmia")
-	return
-      }
-      resp.seasonpasses.forEach(function(e) {
-        doresult('seasonpasses',{'id': e.id}, e.id)
-      })
+    $.ajax({
+      dataType: "json",
+      url: '/listseasonpasses',
+      success: function(resp) {
+        if(!resp.seasonpasses) {
+          $("#table").html('<span class="text-error">Suosikkisarjojen haku epäonnistui.</span>')
+	  return
+        }
+        resp.seasonpasses.forEach(function(e) {
+          doresult('seasonpasses',{'id': e.id}, e.id)
+        })
+      },
+      error: function(jq,text,error) {
+        $("#table").html('<span class="text-error">Suosikkisarjojen haku epäonnistui.</span>')
+      },
     })
   }
   else {
@@ -509,20 +521,27 @@ function showresults(r,id) {
 }
 
 function togglequality() {
-  if (quality!="mp4") {
+  if (quality!="mp4" && quality!="mpeg4") {
     quality="mp4"
     $.cookie('quality', 'mp4' ,{ expires: 365, path: '/' })
+  }
+  else if (quality!="mpeg4") {
+    quality="mpeg4"
+    $.cookie('quality', 'mpeg4' ,{ expires: 365, path: '/' })
   }
   else {
     quality="h264"
     $.cookie('quality', 'h264' ,{ expires: 365, path: '/' })
   }
-  location.reload()
+  init()
 }
 
 function showquality() {
-  if (quality!="mp4") {
+  if (quality!="mp4" && quality!="mpeg4") {
     $('#qualitysettings').html('<button type="button" class="btn" onclick="togglequality()">Vaihda laatu (nyt: 2M)</button>')
+  }
+  else if (quality!="mp4") {
+    $('#qualitysettings').html('<button type="button" class="btn btn-info" onclick="togglequality()">Vaihda laatu (nyt: 1M)</button>')
   }
   else {
     $('#qualitysettings').html('<button type="button" class="btn btn-inverse" onclick="togglequality()">Vaihda laatu (nyt: 300k)</button>')
@@ -565,6 +584,7 @@ function changelog() {
   html='\
 <h3>Viimeisimmät muutokset</h3>\
 <table class="table">\
+<tr><td>8.3.2013</td> <td>Lisätty tuki uudelle 1M MPEG4-streamille </td></tr>\
 <tr><td>27.3.2013</td> <td>Lisätty pitkään painamalla esiin tuleva valikko, josta ohjelman saa lisättyä katselulistalle tai sarjoihin </td></tr>\
 <tr><td>21.3.2013</td> <td>Käytettävyysparannuksia </td></tr>\
 <tr><td>9.3.2013</td> <td>Ensimmäinen julkinen versio  </td></tr>\
