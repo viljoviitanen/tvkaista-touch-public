@@ -35,9 +35,16 @@ class LoginHandler(webapp2.RequestHandler):
 
 class MenuHandler(webapp2.RequestHandler):
   def post(self):
+    res='error'
+    try:
+      #CSRF preventation token
+      if self.request.cookies.get('token') == self.request.POST['token']:
+        res='ok'
+    except KeyError:
+      pass
     time.sleep(1)
     self.response.headers['Content-Type'] = 'application/json'   
-    self.response.write(json.dumps( { 'result': 'ok' } ))
+    self.response.write(json.dumps( { 'result': res } ))
 
 class ListSeasonPassesHandler(webapp2.RequestHandler):
   def get(self):

@@ -23,6 +23,7 @@ var programs=[]
 var currentday
 var quality
 var scrolling
+var token
 
 $.ajaxSetup({
    timeout: 10000,
@@ -50,6 +51,9 @@ $(document).ready(function () {
     quality="mpeg4"
   }
   $.cookie.json = true;
+  random=Math.random()
+  //CSRF preventation token
+  $.cookie('token', random)
   hidechannels=$.cookie('hide')
   if(!hidechannels) hidechannels={}
   if (!$.cookie('login')) {
@@ -303,7 +307,7 @@ function menuclick(e,operation,t)
       url: '/menu',
       type: 'POST',
       context: e,
-      data: { op: operation, id: $(e).data("id") },
+      data: { op: operation, id: $(e).data("id"), token: random }, // CSRF preventation token. This is the only call that has any side effects on the server.
       success: function(resp) {
         html=$(this).html()
         if(resp.result != 'ok') {
