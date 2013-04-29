@@ -512,7 +512,7 @@ function showresults(r,id) {
     //note: json api returns timestamp in finnish time. this is so this app never needs to deal with DST or timezones
     weekday=dayofweek(stamp.getUTCDay())
     day=stamp.getUTCDate()
-    month=stamp.getUTCMonth()
+    month=1+stamp.getUTCMonth()
     hour=addzero(stamp.getUTCHours())
     min=addzero(stamp.getMinutes())
     title=weekday+' '+day+'.'+month+'. klo '+hour+'.'+min+' '+escapehtml(e.title)
