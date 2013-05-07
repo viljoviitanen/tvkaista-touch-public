@@ -588,7 +588,7 @@ function changelog() {
   html='\
 <h3>Viimeisimmät muutokset</h3>\
 <table class="table">\
-<tr><td>8.3.2013</td> <td>Lisätty tuki uudelle 1M MPEG4-streamille </td></tr>\
+<tr><td>8.4.2013</td> <td>Lisätty tuki uudelle 1M MPEG4-streamille </td></tr>\
 <tr><td>27.3.2013</td> <td>Lisätty pitkään painamalla esiin tuleva valikko, josta ohjelman saa lisättyä katselulistalle tai sarjoihin </td></tr>\
 <tr><td>21.3.2013</td> <td>Käytettävyysparannuksia </td></tr>\
 <tr><td>9.3.2013</td> <td>Ensimmäinen julkinen versio  </td></tr>\
