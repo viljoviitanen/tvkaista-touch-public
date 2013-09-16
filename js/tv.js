@@ -22,7 +22,7 @@ var channels
 var programs=[]
 var currentday
 var quality
-var scrolling
+var scrolling=0
 var token
 
 $.ajaxSetup({
@@ -32,14 +32,18 @@ $.ajaxSetup({
    },
 });
 
+function scrollon() {
+  scrolling++
+}
+function scrolloff() {
+  setTimeout(function() { scrolling-- },500)
+}
 $(document).ready(function () {
   //otherwise IE10 on a windows 8 tablet registers taphold even when scrolling
-  $(window).scrollstart(function() {
-    scrolling=1
-  })
-  $(window).scrollstop(function() {
-    setTimeout(function() { scrolling=0 },500)
-  })
+  $("#popupcontent").scrollstart(scrollon)
+  $("#popupcontent").scrollstop(scrolloff)
+  $(window).scrollstart(scrollon)
+  $(window).scrollstop(scrolloff)
 
   if ($.cookie('quality')!="mp4" && $.cookie('quality')!="mpeg4") {
     quality="h264"
@@ -327,12 +331,13 @@ function menuclick(e,operation,t)
   })
 }
 
-function menu() {
+function holdmenu() {
   if (scrolling) {
     return
   }
   $(this).off('click')
-  html="<b>"+$(this).data("title")+"</b><br>"
+  $(this).off('taphold')
+  html=''
   if (location.hash=='#playlist') {
     html+='<button type="button" data-loading-text="Poistetaan listalta..." data-id="'+$(this).data("id")+'" onclick="menuclick(this,1)" class="btn">Poista katselulistalta</button> '
   }
@@ -345,12 +350,13 @@ function menu() {
   else {
     html+='<button type="button" data-loading-text="Lisätään sarjoihin..." data-id="'+$(this).data("id")+'" onclick="menuclick(this,4,'+"'"+$(this).data("title")+"'"+')" class="btn">Lisää sarjoihin</button> '
   }
-  html+='<button type="button" data-url="'+$(this).data("url")+'" class="btn play">Toista</button> '
+  html+='<button type="button" data-url="'+$(this).data("url")+'" class="btn play">Toista</button><br>'
+  html+=$(this).html()
   $(this).html(html)
-  $('.play').click(play)
+  $('.play').click(playvideo)
 }
 
-function play() {
+function playvideo() {
   url=$(this).data("url")
   if (url.indexOf("PUUTTUU") != -1) {
     alert("Ohjelman videomuunnos puuttuu")
@@ -369,8 +375,8 @@ function showslot(e) {
   else if ($(e).data("state")=="ready") {
     $('#popupcontent').html('<table><tr>'+$(e).data("x")+'</tr></table>')
     $('#popup').modal()
-    $('.program').click(play)
-    $('.program').taphold(menu)
+    $('.program').click(playvideo)
+    $('.program').taphold(holdmenu)
   }
 }
 
@@ -521,7 +527,7 @@ function showresults(r,id) {
   html+='</table>'
   $('#'+id).html(html)
   $('.'+id).click(play)
-  $('.'+id).taphold(menu)
+  $('.'+id).taphold(holdmenu)
 }
 
 function togglequality() {
@@ -588,6 +594,7 @@ function changelog() {
   html='\
 <h3>Viimeisimmät muutokset</h3>\
 <table class="table">\
+<tr><td>16.9.2013</td> <td>Parannuksia pitkään painamalla esiin tulevaan valikkoon </td></tr>\
 <tr><td>8.4.2013</td> <td>Lisätty tuki uudelle 1M MPEG4-streamille </td></tr>\
 <tr><td>27.3.2013</td> <td>Lisätty pitkään painamalla esiin tuleva valikko, josta ohjelman saa lisättyä katselulistalle tai sarjoihin </td></tr>\
 <tr><td>21.3.2013</td> <td>Käytettävyysparannuksia </td></tr>\
