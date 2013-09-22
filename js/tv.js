@@ -526,7 +526,7 @@ function showresults(r,id) {
   })
   html+='</table>'
   $('#'+id).html(html)
-  $('.'+id).click(play)
+  $('.'+id).click(playvideo)
   $('.'+id).taphold(holdmenu)
 }
 
