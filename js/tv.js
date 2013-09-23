@@ -351,6 +351,8 @@ function holdmenu() {
     html+='<button type="button" data-loading-text="Lisätään sarjoihin..." data-id="'+$(this).data("id")+'" onclick="menuclick(this,4,'+"'"+$(this).data("title")+"'"+')" class="btn">Lisää sarjoihin</button> '
   }
   html+='<button type="button" data-url="'+$(this).data("url")+'" class="btn play">Toista</button><br>'
+  cred='?username='+encodeURIComponent($.cookie('login').user)+'&password='+encodeURIComponent($.cookie('login').pass)
+  html+='<a href="'+$(this).data("url")+cred+'" download><button type="button" class="btn play">Lataa</button></a><br>'
   html+=$(this).html()
   $(this).html(html)
   $('.play').click(playvideo)
