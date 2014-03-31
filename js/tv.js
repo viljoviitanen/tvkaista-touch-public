@@ -1,6 +1,6 @@
 // vim: set autoindent: 
 
-// Copyright (C) 2013 Viljo Viitanen
+// Copyright (C) 2013-2014 Viljo Viitanen
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -389,20 +389,35 @@ function login() {
   }
   $('#loginbutton').attr("disabled", true);
   $("#spinner").show()
-  $.post('/login',{ u: $('#user').val(), p: $('#pass').val() },function(resp) {
-    $('#loginbutton').attr("disabled", false);
-    if (resp.login != 'ok') {
-      alert("Kirjautuminen epäonnistui, tarkista käyttäjätunnus ja salasana")
-    }
-    else {
-  $.cookie.json = true;
-      $.cookie('login',{ user: $('#user').val(), pass: $('#pass').val() } ,{ expires: exp, path: '/' })
-      $('.notlogged').hide()
-      $('.logged').show()
-      // detect hash changes via back/forward
-      window.onhashchange=init;
-      init()
-    }
+  $.ajax({
+    dataType: 'json',
+    url: '/login',
+    type: 'POST',
+    data: { u: $('#user').val(), p: $('#pass').val() },
+    error: function(resp) {
+      $('#loginbutton').attr("disabled", false);
+      alert("Kirjautuminen epäonnistui.")
+    },
+    success: function(resp) {
+      $('#loginbutton').attr("disabled", false);
+      if (resp.login != 'ok') {
+        if (resp.login != '') {
+          alert("Kirjautuminen epäonnistui: "+resp.login)
+        }
+        else {
+          alert("Kirjautuminen epäonnistui tuntemattomasta syystä")
+        }
+      }
+      else {
+      $.cookie.json = true;
+        $.cookie('login',{ user: $('#user').val(), pass: $('#pass').val() } ,{ expires: exp, path: '/' })
+        $('.notlogged').hide()
+        $('.logged').show()
+        // detect hash changes via back/forward
+        window.onhashchange=init;
+        init()
+      }
+    },
   })
   return false;
 }
