@@ -28,8 +28,10 @@ class LoginHandler(webapp2.RequestHandler):
   def post(self):
     if self.request.POST['u'] != '' and self.request.POST['p'] != '' :
       resp="ok"
+    elif self.request.POST['u'] == '':
+      resp="käyttäjätunnus puuttuu"
     else:
-      resp="error"
+      resp="salasana puuttuu"
     self.response.headers['Content-Type'] = 'application/json'   
     self.response.write(json.dumps( { 'login': resp } ))
 
