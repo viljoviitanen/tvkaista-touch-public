@@ -35,7 +35,13 @@ ja käyttöliittymää voi testata menemällä selaimella osoitteeseen http://12
 > Huom. www-serveri on auki myös "maailmalle", eli myös muilta laitteilta
 > pääsee testaamaan käyttöliittymää, mikäli portti 8080 on sallittu koneesi paikallsesta palomuurista.
 
-Sovelluksen ajaminen herokussa on hyvin helppoa. Ohjeet herokun käyttöönottoon ovat osoitteessa
+Sovelluksen ajaminen Herokussa on äärimmäisen helppoa: Paina tätä alla olevaa nappia:
+
+[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
+
+ja saat oman heroku-sovelluksen, jonka koodin voit kloonata itsellesi ja viedä muutokset takaisin herokun git-repoon.
+
+Vaihtoehtoisesti jos tahdot käyttää herokua perinteisesti, katso ensin
 https://devcenter.heroku.com/articles/quickstart . Pitää vain asentaa herokun "toolbelt",
 ja sen jälkeen riittää ajaa nämä komennot:
 
