@@ -72,7 +72,7 @@ class ProgramHandler(webapp2.RequestHandler):
     i=0
     basetime=time.time()-hour*3600
     while i<hour:
-      resp.append({ 'time': 1000*(basetime+3600*i), 'purl': 'http://s3.amazonaws.com/viljoviitanen/WP_20130315_110705Z.mp4', 'title': ('Ohjelma %d'%i), 'desc': 'Ohjelman kuvaus', 'ch': 'KANAVA', 'id': 10000+i})
+      resp.append({ 'time': 1000*(basetime+3600*i), 'purl': 'http://s3.amazonaws.com/viljoviitanen/WP_20130315_110705Z.mp4', 'title': ('Ohjelma %d'%i), 'desc': 'Ohjelman kuvaus', 'ch': 'KANAVA', 'id': 10000+i, 'dur': 100+i})
       i=i+1
 
     self.response.headers['Content-Type'] = 'application/json'   
@@ -87,7 +87,7 @@ class SearchHandler(webapp2.RequestHandler):
     hour=20
     basetime=time.time()-hour*3600
     while i<hour:
-      resp.append({ 'time': 1000*(basetime+3600*i), 'purl': 'http://s3.amazonaws.com/viljoviitanen/WP_20130315_110705Z.mp4', 'title': ('Ohjelma %d'%i), 'desc': 'Ohjelman kuvaus', 'ch': 'KANAVA', 'id': 10000+i})
+      resp.append({ 'time': 1000*(basetime+3600*i), 'purl': 'http://s3.amazonaws.com/viljoviitanen/WP_20130315_110705Z.mp4', 'title': ('Ohjelma %d'%i), 'desc': 'Ohjelman kuvaus', 'ch': 'KANAVA', 'id': 10000+i, 'dur': 100+i})
       i=i+1
 
     self.response.headers['Content-Type'] = 'application/json'   

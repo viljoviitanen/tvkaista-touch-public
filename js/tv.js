@@ -538,7 +538,7 @@ function showresults(r,id) {
     month=1+stamp.getUTCMonth()
     hour=addzero(stamp.getUTCHours())
     min=addzero(stamp.getMinutes())
-    title=weekday+' '+day+'.'+month+'. klo '+hour+'.'+min+' '+escapehtml(e.title)
+    title=weekday+' '+day+'.'+month+'. klo '+hour+'.'+min+' '+e.dur+' min '+escapehtml(e.title)
     html+='<tr><td class="programrow '+id+'" data-title="'+title+'" data-seasonpass="'+id+'" data-id="'+e.id+'" data-url="'+e.purl+'"><b>'+title+'</b><br>'+escapehtml(e.desc)+' ('+e.ch+')</td></tr>'
   })
   html+='</table>'
